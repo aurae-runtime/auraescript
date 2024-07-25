@@ -1,0 +1,94 @@
+# ---------------------------------------------------------------------------- #
+#                                                                              #
+#                +--------------------------------------------+                #
+#                |   █████╗ ██╗   ██╗██████╗  █████╗ ███████╗ |                #
+#                |  ██╔══██╗██║   ██║██╔══██╗██╔══██╗██╔════╝ |                #
+#                |  ███████║██║   ██║██████╔╝███████║█████╗   |                #
+#                |  ██╔══██║██║   ██║██╔══██╗██╔══██║██╔══╝   |                #
+#                |  ██║  ██║╚██████╔╝██║  ██║██║  ██║███████╗ |                #
+#                |  ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝ |                #
+#                +--------------------------------------------+                #
+#                                                                              #
+#                         Distributed Systems Runtime                          #
+#                                                                              #
+# ---------------------------------------------------------------------------- #
+#                                                                              #
+#  Copyright 2022 - 2024, the Aurae contributors                               #
+#  SPDX-License-Identifier: Apache-2.0                                         #
+#                                                                              #
+# ---------------------------------------------------------------------------- #
+#
+# This is the "test all the things" workflow for aurae
+#
+# This build check will introduce confidence for the following:
+#
+# - That the code does not warn (due to clippy errors/warnings)
+#
+name: "Test all (004) [ubuntu:latest] [test-all]"
+on:
+  push:
+    branches: main
+  pull_request:
+    branches: main
+env:
+  CARGO_TERM_COLOR: always
+jobs:
+  test-all:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: bufbuild/buf-setup-action@v1
+        with:
+          github_token: ${{ github.token }}
+          version: 1.32.0
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: 000-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            000-${{ runner.os }}-cargo-
+      - name: Install rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: clippy, rustfmt
+      - name: Install protoc-gen-doc in [ubuntu:latest]
+        run: |
+          wget https://github.com/pseudomuto/protoc-gen-doc/releases/download/v1.5.1/protoc-gen-doc_1.5.1_linux_amd64.tar.gz
+          tar -xzf protoc-gen-doc_1.5.1_linux_amd64.tar.gz
+          chmod +x protoc-gen-doc
+          cp protoc-gen-doc /usr/local/bin/protoc-gen-doc
+          sudo apt-get update
+          sudo apt-get install -y protobuf-compiler
+      - name: Install compile time dependencies (musl-tools) in [ubuntu:latest]
+        #
+        # Do not add GNU libraries here! Do not add GNU libraries here!
+        #
+        # Please (seriously please) be careful about adding commands here.
+        # This is our core way of validating that our binary is "healthy"
+        # If we need to install anything with the word "lib" in it to get
+        # the build to pass, we likely should be having other discussions
+        # instead of adding commands here.
+        #
+        # Do not add GNU libraries here! Do not add GNU libraries here!
+        #
+        # For example, we should NOT be adding libraries such as "libseccomp"
+        # or "libdbus".
+        #
+        # If in doubt, please ask in Discord in the build channel.
+        #
+        # Do not at GNU libraries here! Do not add GNU libraries here!
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y musl-tools
+      - name: test-all
+        # This should remain the only command we execute as this matches the title of the file.
+        # The goal is for this to be easy to find from the GitHub dashboard.
+        # Instead of adding more commands here, consider another make target or a new YAML file
+        # named with a good name.
+        run: make test-all

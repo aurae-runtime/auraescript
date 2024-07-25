@@ -29,7 +29,7 @@
 #
 # When this build passes we should have a "clean cargo" output!
 #
-name: "Tester (002) [ubuntu:latest] [auraescript]"
+name: "Tester (001) [ubuntu:latest] [auraed]"
 on:
   push:
     branches: main
@@ -57,6 +57,11 @@ jobs:
           key: 000-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             000-${{ runner.os }}-cargo-
+      - name: Install rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: clippy, rustfmt
       - name: Install protoc-gen-doc in [ubuntu:latest]
         run: |
           wget https://github.com/pseudomuto/protoc-gen-doc/releases/download/v1.5.1/protoc-gen-doc_1.5.1_linux_amd64.tar.gz
@@ -86,9 +91,5 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y musl-tools
-      - name: Cargo build, lint, test [make test]
-        # This should remain the only command we execute as this matches the title of the file.
-        # The goal is for this to be easy to find from the GitHub dashboard.
-        # Instead of adding more commands here, consider another make target or a new YAML file
-        # named with a good name.
-        run: make auraescript-test
+      - name: Lint and test [auraed]
+        run: make auraed-lint auraed-test

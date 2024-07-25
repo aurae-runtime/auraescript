@@ -86,9 +86,5 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y musl-tools
-      - name: Cargo build, lint, test [make test]
-        # This should remain the only command we execute as this matches the title of the file.
-        # The goal is for this to be easy to find from the GitHub dashboard.
-        # Instead of adding more commands here, consider another make target or a new YAML file
-        # named with a good name.
-        run: make aer-test
+      - name: Lint and test [aer]
+        run: make aer-lint aer-test
