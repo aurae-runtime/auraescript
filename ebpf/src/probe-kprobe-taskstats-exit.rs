@@ -49,7 +49,7 @@ pub static LICENSE: [u8; 13] = *b"Dual MIT/GPL\0";
 
 #[map(name = "PROCESS_EXITS")]
 static mut PROCESS_EXITS: PerfEventArray<ProcessExit> =
-    PerfEventArray::<ProcessExit>::with_max_entries(1024, 0);
+    PerfEventArray::<ProcessExit>::new(0);
 
 #[kprobe]
 pub fn kprobe_taskstats_exit(ctx: ProbeContext) -> u32 {

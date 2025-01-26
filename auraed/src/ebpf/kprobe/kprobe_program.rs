@@ -13,7 +13,7 @@
  * SPDX-License-Identifier: Apache-2.0                                        *
 \* -------------------------------------------------------------------------- */
 use aya::programs::{KProbe, ProgramError};
-use aya::Bpf;
+use aya::Ebpf;
 use tracing::{trace, warn};
 
 pub trait KProbeProgram<T: Clone + Send + 'static> {
@@ -21,7 +21,7 @@ pub trait KProbeProgram<T: Clone + Send + 'static> {
     const FUNCTION_NAME: &'static str;
     const PERF_BUFFER: &'static str;
 
-    fn load_and_attach(bpf: &mut Bpf) -> Result<(), anyhow::Error> {
+    fn load_and_attach(bpf: &mut Ebpf) -> Result<(), anyhow::Error> {
         trace!("Loading eBPF program: {}", Self::PROGRAM_NAME);
 
         // Load the eBPF TracePoint program

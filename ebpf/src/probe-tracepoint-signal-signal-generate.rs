@@ -48,8 +48,7 @@ use aya_ebpf::programs::TracePointContext;
 pub static LICENSE: [u8; 13] = *b"Dual MIT/GPL\0";
 
 #[map(name = "SIGNALS")]
-static mut SIGNALS: PerfEventArray<Signal> =
-    PerfEventArray::<Signal>::with_max_entries(1024, 0);
+static mut SIGNALS: PerfEventArray<Signal> = PerfEventArray::<Signal>::new(0);
 
 // TODO (jeroensoeters): figure out how stable these offsets are and if we want
 //    to read from /sys/kernel/debug/tracing/events/signal/signal_generate/format
