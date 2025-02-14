@@ -156,7 +156,7 @@ impl Cell {
         let CellState::Allocated { nested_auraed, .. } = &self.state else {
             return Err(CellsError::CellNotAllocated {
                 cell_name: self.cell_name.clone(),
-            })
+            });
         };
 
         Ok(nested_auraed.client_socket.clone())
@@ -173,8 +173,8 @@ impl Cell {
 
     /// Returns [None] if the [Cell] is not allocated.
     pub fn v2(&self) -> Option<bool> {
-        let CellState::Allocated { cgroup, ..} = &self.state else {
-            return None
+        let CellState::Allocated { cgroup, .. } = &self.state else {
+            return None;
         };
 
         Some(cgroup.v2())
@@ -188,7 +188,9 @@ impl CellsCache for Cell {
         cell_spec: CellSpec,
     ) -> Result<&Cell> {
         let CellState::Allocated { children, .. } = &mut self.state else {
-            return Err(CellsError::CellNotAllocated { cell_name: self.cell_name.clone() })
+            return Err(CellsError::CellNotAllocated {
+                cell_name: self.cell_name.clone(),
+            });
         };
 
         children.allocate(cell_name, cell_spec)
@@ -196,7 +198,9 @@ impl CellsCache for Cell {
 
     fn free(&mut self, cell_name: &CellName) -> Result<()> {
         let CellState::Allocated { children, .. } = &mut self.state else {
-            return Err(CellsError::CellNotAllocated { cell_name: self.cell_name.clone() })
+            return Err(CellsError::CellNotAllocated {
+                cell_name: self.cell_name.clone(),
+            });
         };
 
         children.free(cell_name)
@@ -207,7 +211,9 @@ impl CellsCache for Cell {
         F: Fn(&Cell) -> Result<R>,
     {
         let CellState::Allocated { children, .. } = &mut self.state else {
-            return Err(CellsError::CellNotAllocated { cell_name: self.cell_name.clone() })
+            return Err(CellsError::CellNotAllocated {
+                cell_name: self.cell_name.clone(),
+            });
         };
 
         children.get(cell_name, f)
@@ -218,7 +224,9 @@ impl CellsCache for Cell {
         F: Fn(&Cell) -> Result<R>,
     {
         let CellState::Allocated { children, .. } = &self.state else {
-            return Err(CellsError::CellNotAllocated { cell_name: self.cell_name.clone() })
+            return Err(CellsError::CellNotAllocated {
+                cell_name: self.cell_name.clone(),
+            });
         };
 
         children.get_all(f)
