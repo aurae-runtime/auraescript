@@ -19,14 +19,14 @@ use super::{
     BpfFile,
 };
 
-use aya::Bpf;
+use aya::Ebpf;
 use tracing::warn;
 
 // This is critical to maintain the memory presence of the
 // loaded bpf object.
 // This specific BPF object needs to persist up to lib.rs such that
 // the rest of the program can access this scope.
-pub struct BpfContext(Vec<Bpf>);
+pub struct BpfContext(Vec<Ebpf>);
 
 impl BpfContext {
     pub fn new() -> Self {

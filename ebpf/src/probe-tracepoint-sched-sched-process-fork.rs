@@ -48,7 +48,7 @@ pub static LICENSE: [u8; 13] = *b"Dual MIT/GPL\0";
 
 #[map(name = "FORKED_PROCESSES")]
 static mut FORKED_PROCESSES: PerfEventArray<ForkedProcess> =
-    PerfEventArray::<ForkedProcess>::with_max_entries(1024, 0);
+    PerfEventArray::<ForkedProcess>::new(0);
 
 const PARENT_PID_OFFSET: usize = 24;
 const CHILD_PID_OFFSET: usize = 44;

@@ -15,7 +15,7 @@
 
 use anyhow::Context;
 use aya::programs::{ProgramError, TracePoint};
-use aya::Bpf;
+use aya::Ebpf;
 use tracing::{trace, warn};
 
 pub trait TracepointProgram<T: Clone + Send + 'static> {
@@ -24,7 +24,7 @@ pub trait TracepointProgram<T: Clone + Send + 'static> {
     const EVENT: &'static str;
     const PERF_BUFFER: &'static str;
 
-    fn load_and_attach(bpf: &mut Bpf) -> Result<(), anyhow::Error> {
+    fn load_and_attach(bpf: &mut Ebpf) -> Result<(), anyhow::Error> {
         trace!("Loading eBPF program: {}", Self::PROGRAM_NAME);
 
         // Load the eBPF TracePoint program

@@ -17,7 +17,7 @@ use anyhow::Context;
 use aya::{
     maps::perf::AsyncPerfEventArray,
     util::{nr_cpus, online_cpus},
-    Bpf,
+    Ebpf,
 };
 use bytes::BytesMut;
 use procfs::page_size;
@@ -32,11 +32,19 @@ const PER_CPU_BUFFER_SIZE_IN_PAGES: usize = 2;
 
 pub trait PerfBufferReader<T: Clone + Send + 'static> {
     fn read_from_perf_buffer(
-        bpf: &mut Bpf,
+        bpf: &mut Ebpf,
         perf_buffer: &'static str,
     ) -> anyhow::Result<PerfEventBroadcast<T>> {
         // Query the number of CPUs on the host
-        let num_cpus = nr_cpus()?;
+        let num_cpus = nr_cpus().map_err(|(path, error)| {
+            std::io::Error::new(
+                error.kind(),
+                format!(
+                    "Failed to get the number of CPUs at {}: {}",
+                    path, error
+                ),
+            )
+        })?;
 
         // Query the page size on the host
         let page_size = page_size();
@@ -66,8 +74,14 @@ pub trait PerfBufferReader<T: Clone + Send + 'static> {
                 .context("Failed to find '{perf_buffer}' perf event array")?,
         )?;
 
+        let online_cpus = online_cpus().map_err(|(path, error)| {
+            std::io::Error::new(
+                error.kind(),
+                format!("Failed to get online CPUs at {}: {}", path, error),
+            )
+        })?;
         // Spawn a thread per CPU to listen for events from the kernel.
-        for cpu_id in online_cpus()? {
+        for cpu_id in online_cpus {
             trace!("spawning task for cpu {cpu_id}");
             // Open the per-CPU buffer for the current CPU id
             let mut per_cpu_buffer =

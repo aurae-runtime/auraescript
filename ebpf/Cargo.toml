@@ -20,8 +20,8 @@ license = "Dual MIT/GPL"
 
 [dependencies]
 aurae-ebpf-shared = { path = "../ebpf-shared" }
-aya-ebpf = "0.1.0"
-aya-log-ebpf = "0.1.0"
+aya-ebpf = "0.1.1"
+aya-log-ebpf = "0.1.1"
 
 [[bin]]
 name = "instrument-tracepoint-signal-signal-generate"

@@ -14,16 +14,16 @@
 \* -------------------------------------------------------------------------- */
 
 use crate::AURAED_RUNTIME;
-use aya::{Bpf, BpfError};
+use aya::{Ebpf, EbpfError};
 use tracing::trace;
 
 pub trait BpfFile {
     const OBJ_NAME: &'static str;
 
-    fn load() -> Result<Bpf, BpfError> {
+    fn load() -> Result<Ebpf, EbpfError> {
         trace!("Loading eBPF file: {}", Self::OBJ_NAME);
 
-        Bpf::load_file(format!(
+        Ebpf::load_file(format!(
             "{}/ebpf/{}",
             AURAED_RUNTIME
                 .get()
