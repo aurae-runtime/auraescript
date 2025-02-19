@@ -1,6 +1,4 @@
 # ---------------------------------------------------------------------------- #
-#                                                                              #
-#                +--------------------------------------------+                #
 #                |   █████╗ ██╗   ██╗██████╗  █████╗ ███████╗ |                #
 #                |  ██╔══██╗██║   ██║██╔══██╗██╔══██╗██╔════╝ |                #
 #                |  ███████║██║   ██║██████╔╝███████║█████╗   |                #
@@ -10,12 +8,9 @@
 #                +--------------------------------------------+                #
 #                                                                              #
 #                         Distributed Systems Runtime                          #
-#                                                                              #
 # ---------------------------------------------------------------------------- #
-#                                                                              #
-#  Copyright 2022 - 2024, the Aurae contributors                               #
-#  SPDX-License-Identifier: Apache-2.0                                         #
-#                                                                              #
+# Copyright 2022 - 2024, the aurae contributors                                #
+# SPDX-License-Identifier: Apache-2.0                                          #
 # ---------------------------------------------------------------------------- #
 #
 # This is the premerge test workflow for auraed
@@ -63,7 +58,7 @@ jobs:
         with:
           toolchain: stable
           components: clippy, rustfmt
-      - name: Cargo build, lint, test [make test]
+      - name: Auraed test [make os-deps auraed-test]
         # This should remain the only command we execute as this matches the title of the file.
         # The goal is for this to be easy to find from the GitHub dashboard.
         # Instead of adding more commands here, consider another make target or a new YAML file

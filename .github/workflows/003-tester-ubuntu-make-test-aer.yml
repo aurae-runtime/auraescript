@@ -1,6 +1,4 @@
 # ---------------------------------------------------------------------------- #
-#                                                                              #
-#                +--------------------------------------------+                #
 #                |   █████╗ ██╗   ██╗██████╗  █████╗ ███████╗ |                #
 #                |  ██╔══██╗██║   ██║██╔══██╗██╔══██╗██╔════╝ |                #
 #                |  ███████║██║   ██║██████╔╝███████║█████╗   |                #
@@ -10,12 +8,9 @@
 #                +--------------------------------------------+                #
 #                                                                              #
 #                         Distributed Systems Runtime                          #
-#                                                                              #
 # ---------------------------------------------------------------------------- #
-#                                                                              #
-#  Copyright 2022 - 2024, the Aurae contributors                               #
-#  SPDX-License-Identifier: Apache-2.0                                         #
-#                                                                              #
+# Copyright 2022 - 2024, the aurae contributors                                #
+# SPDX-License-Identifier: Apache-2.0                                          #
 # ---------------------------------------------------------------------------- #
 #
 # This is the premerge test workflow for aer
@@ -58,38 +53,9 @@ jobs:
           key: 000-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: |
             000-${{ runner.os }}-cargo-
-      - name: Install protoc-gen-doc in [ubuntu:latest]
-        run: |
-          wget https://github.com/pseudomuto/protoc-gen-doc/releases/download/v1.5.1/protoc-gen-doc_1.5.1_linux_amd64.tar.gz
-          tar -xzf protoc-gen-doc_1.5.1_linux_amd64.tar.gz
-          chmod +x protoc-gen-doc
-          cp protoc-gen-doc /usr/local/bin/protoc-gen-doc
-          sudo apt-get update
-          sudo apt-get install -y protobuf-compiler
-      - name: Install compile time dependencies (musl-tools) in [ubuntu:latest]
-        #
-        # Do not add GNU libraries here! Do not add GNU libraries here!
-        #
-        # Please (seriously please) be careful about adding commands here.
-        # This is our core way of validating that our binary is "healthy"
-        # If we need to install anything with the word "lib" in it to get
-        # the build to pass, we likely should be having other discussions
-        # instead of adding commands here.
-        #
-        # Do not add GNU libraries here! Do not add GNU libraries here!
-        #
-        # For example, we should NOT be adding libraries such as "libseccomp"
-        # or "libdbus".
-        #
-        # If in doubt, please ask in Discord in the build channel.
-        #
-        # Do not at GNU libraries here! Do not add GNU libraries here!
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y musl-tools
-      - name: Cargo build, lint, test [make test]
+      - name: aer test [make os-deps aer-test]
         # This should remain the only command we execute as this matches the title of the file.
         # The goal is for this to be easy to find from the GitHub dashboard.
         # Instead of adding more commands here, consider another make target or a new YAML file
         # named with a good name.
-        run: make aer-test
+        run: make os-deps aer-test
