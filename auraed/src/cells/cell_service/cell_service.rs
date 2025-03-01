@@ -560,14 +560,16 @@ impl cell_service_server::CellService for CellService {
 mod tests {
     use super::*;
     use crate::{
+        cells::cell_service::executables::ExecutableName,
         cells::cell_service::validation::{
             ValidatedCell, ValidatedCpuController, ValidatedCpusetController,
-            ValidatedMemoryController,
+            ValidatedExecutable, ValidatedMemoryController,
         },
         logging::log_channel::LogChannel,
     };
     use crate::{AuraedRuntime, AURAED_RUNTIME};
     use iter_tools::Itertools;
+    use std::ffi::OsString;
     use test_helpers::*;
 
     /// Test for the list function.
@@ -645,6 +647,35 @@ mod tests {
         assert_eq!(actual_nested_cell_names, expected_nested_cell_names);
     }
 
+    #[tokio::test]
+    async fn test_start_stop_free() {
+        skip_if_not_root!("test_start_stop_free");
+        skip_if_seccomp!("test_start_stop_free");
+
+        let _ = AURAED_RUNTIME.set(AuraedRuntime::default());
+
+        let service = CellService::new(ObserveService::new(
+            Arc::new(LogChannel::new(String::from("test"))),
+            (None, None, None),
+        ));
+
+        let cell_name = format!("ae-test-{}", uuid::Uuid::new_v4());
+        assert!(service.allocate(allocate_request(&cell_name)).await.is_ok());
+
+        let executable_name = format!("ae-exec-{}", uuid::Uuid::new_v4());
+        let command = "tail -f /dev/null";
+        let result =
+            service.start(start_request(&executable_name, command)).await;
+        assert!(result.is_ok());
+
+        let response = result.unwrap().into_inner();
+        assert!(response.pid != 0);
+
+        assert!(service.stop(stop_request(&executable_name)).await.is_ok());
+
+        assert!(service.free(free_request(&cell_name)).await.is_ok());
+    }
+
     /// Helper function to create a ValidatedCellServiceAllocateRequest.
     ///
     /// # Arguments
@@ -675,5 +706,35 @@ mod tests {
         };
         // Return the validated allocate request
         ValidatedCellServiceAllocateRequest { cell }
+    }
+
+    fn start_request(
+        executable_name: &str,
+        command: &str,
+    ) -> ValidatedCellServiceStartRequest {
+        let executable = ValidatedExecutable {
+            name: ExecutableName::new(String::from(executable_name)),
+            command: OsString::from(command),
+            description: String::new(),
+        };
+
+        ValidatedCellServiceStartRequest {
+            cell_name: None,
+            executable,
+            uid: None,
+            gid: None,
+        }
+    }
+
+    fn stop_request(executable_name: &str) -> ValidatedCellServiceStopRequest {
+        ValidatedCellServiceStopRequest {
+            cell_name: None,
+            executable_name: ExecutableName::new(String::from(executable_name)),
+        }
+    }
+
+    fn free_request(cell_name: &str) -> ValidatedCellServiceFreeRequest {
+        // Return the validated free request
+        ValidatedCellServiceFreeRequest { cell_name: CellName::from(cell_name) }
     }
 }
